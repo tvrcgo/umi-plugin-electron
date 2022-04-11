@@ -71,10 +71,14 @@ function buildElectronMain(api: IApi) {
       main: resolve(api.paths.absSrcPath!, 'electron/main.ts')
     },
   })
-  compiler.run((err) => {
-    if (err) {
-      api.logger.error(err)
-    }
+  return new Promise((resolve, reject) => {
+    compiler.run((err) => {
+      if (err) {
+        api.logger.error(err)
+        return reject(err)
+      }
+      resolve(1)
+    })
   })
 }
 
@@ -86,21 +90,29 @@ function buildElectronPreload(api: IApi) {
       preload: resolve(api.paths.absSrcPath!, 'electron/preload.ts'),
     }
   })
-  compiler.run((err) => {
-    if (err) {
-      api.logger.error(err)
-    }
+  return new Promise((resolve, reject) => {
+    compiler.run((err) => {
+      if (err) {
+        api.logger.error(err)
+        return reject(err)
+      }
+      resolve(1)
+    })
   })
 }
 
 export function buildElectronSrc(api: IApi) {
-  api.logger.info('Build src/electron')
-  buildElectronMain(api)
-  buildElectronPreload(api)
+  api.logger.info('Build src/electron ...')
+  return Promise.all([
+    buildElectronMain(api),
+    buildElectronPreload(api)
+  ]).then(([main, preload]) => {
+    api.logger.info('Build src/electron done')
+  })
 }
 
 export function buildApp(api: IApi) {
-  api.logger.info('Build app')
+  api.logger.info('Build app ...')
   return electronBuilder.build({
     targets: electronBuilder.Platform.MAC.createTarget(),
     config: {
