@@ -33,7 +33,13 @@ const webpackBaseConfig = (api: IApi) => {
             {
               loader: 'ts-loader',
               options: {
-                transpileOnly: true
+                compilerOptions: {
+                  target: 'es6',
+                  module: 'commonjs',
+                  esModuleInterop: true,
+                  allowSyntheticDefaultImports: true,
+                  importHelpers: false
+                }
               }
             }
           ],
