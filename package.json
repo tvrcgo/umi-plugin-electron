@@ -1,6 +1,6 @@
 {
   "name": "@tvrcgo/umi-plugin-electron",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Umi plugin to build electron app",
   "main": "lib/index.js",
   "files": [
