@@ -14,8 +14,8 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   },
-  "devDependencies": {
-    "electron": "^18.0.3",
+  "dependencies": {
+    "electron": "^17.2.0",
     "electron-builder": "^23.0.3",
     "rimraf": "^3.0.2",
     "ts-loader": "~8.2.0",
