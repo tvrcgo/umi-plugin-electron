@@ -19,11 +19,21 @@ const webpackBaseConfig = (api: IApi) => {
       extensions: ['.tsx', '.ts', '.js'],
       alias: {
         '@': api.paths.absSrcPath!,
-      }
+      },
+      modules: [
+        api.paths.absNodeModulesPath!,
+        resolve(__dirname, '../node_modules')
+      ]
     },
     externals: {
       'electron': 'electron',
       'electron-updater': 'electron-updater',
+    },
+    resolveLoader: {
+      modules: [
+        api.paths.absNodeModulesPath!,
+        resolve(__dirname, '../node_modules')
+      ]
     },
     module: {
       rules: [

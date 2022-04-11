@@ -1,5 +1,6 @@
 import type { IApi } from 'umi'
 import { resolve } from 'path'
+import { existsSync } from 'fs'
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { buildApp, buildElectronSrc } from './build'
 
@@ -17,7 +18,10 @@ export default function(api: IApi) {
 
     if (isFirstCompile && launchElectron) {
       // run electron
-      const electronPath = resolve(api.paths.absNodeModulesPath!, '.bin/electron')
+      const electronPath = [
+        resolve(__dirname, '../node_modules/.bin/electron'),
+        resolve(api.paths.absNodeModulesPath, '.bin/electron')
+      ].filter(v => existsSync(v))[0]
       let elecProc: ChildProcessWithoutNullStreams | null = null
 
       if (elecProc !== null) {
