@@ -1,5 +1,6 @@
 import webpack from 'webpack'
 import { resolve } from 'path'
+import fs from 'fs'
 import type { IApi } from 'umi'
 import * as electronBuilder from 'electron-builder'
 
@@ -108,6 +109,10 @@ export function buildSrc(api: IApi) {
     buildElectronPreload(api)
   ]).then(([main, preload]) => {
     api.logger.info('Build src/electron done')
+    // output assets
+    fs.readdirSync(resolve(api.paths.cwd, 'build/electron')).forEach(file => {
+      console.log(` ${file}\n`);
+    })
   })
 }
 
