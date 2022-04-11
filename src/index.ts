@@ -1,8 +1,6 @@
 import type { IApi } from 'umi'
-import { resolve } from 'path'
-import { existsSync } from 'fs'
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
-import { buildApp, buildElectronSrc } from './build'
+import { buildApp, buildSrc } from './build'
+import electronDev from './dev'
 
 export default function(api: IApi) {
 
@@ -10,41 +8,26 @@ export default function(api: IApi) {
 
   api.onStart(() => {
     if (launchElectron) {
-      buildElectronSrc(api)
+      // buildElectronSrc(api)
     }
   })
 
-  api.onDevCompileDone(({ isFirstCompile, stats }) => {
+  api.onDevCompileDone(async ({ isFirstCompile, stats }) => {
 
     if (isFirstCompile && launchElectron) {
+      // build electron source
+      await buildSrc(api)
       // run electron
-      const electronPath = [
-        resolve(__dirname, '../node_modules/.bin/electron'),
-        resolve(api.paths.absNodeModulesPath, '.bin/electron')
-      ].filter(v => existsSync(v))[0]
-      let elecProc: ChildProcessWithoutNullStreams | null = null
-
-      if (elecProc !== null) {
-        (elecProc as any).kill('SIGKILL')
-        elecProc = null
-      }
-
-      elecProc = spawn(electronPath, [
-        `--inspect=8889`,
-        resolve(api.paths.absTmpPath!, 'electron/main.js'),
-      ])
-
-      elecProc.on('close', (code, signal) => {
-        if (signal != 'SIGKILL') {
-          process.exit(-1)
-        }
-      })
+      electronDev(api)
     }
 
   })
 
   api.onBuildComplete(async ({ stats }) => {
     if (launchElectron) {
+      // build electron source
+      await buildSrc(api)
+      // build app
       buildApp(api)
     }
   })

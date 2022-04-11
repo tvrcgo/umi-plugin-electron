@@ -101,7 +101,7 @@ function buildElectronPreload(api: IApi) {
   })
 }
 
-export function buildElectronSrc(api: IApi) {
+export function buildSrc(api: IApi) {
   api.logger.info('Build src/electron ...')
   return Promise.all([
     buildElectronMain(api),
