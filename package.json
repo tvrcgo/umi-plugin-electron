@@ -15,12 +15,13 @@
     "registry": "https://npm.pkg.github.com/"
   },
   "dependencies": {
+    "ajv": "^8.11.0",
     "electron": "^17.2.0",
     "electron-builder": "^23.0.3",
     "rimraf": "^3.0.2",
     "ts-loader": "~8.2.0",
     "typescript": "^4.6.3",
-    "umi": "^3.5.22",
+    "umi": "^3.2.19",
     "webpack": "^5.72.0"
   },
   "author": "tvrcgo"
