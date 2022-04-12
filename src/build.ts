@@ -1,15 +1,12 @@
 import webpack from 'webpack'
 import { resolve } from 'path'
-import fs from 'fs'
 import type { IApi } from 'umi'
 import * as electronBuilder from 'electron-builder'
 
 const webpackBaseConfig = (api: IApi) => {
   const env: 'development'| 'production' = (api.env === 'development' ? 'development' : 'production')
   const config = api.config.electron
-  const outputPath = env === 'development' ?
-    resolve(api.paths.absTmpPath!, 'electron') :
-    resolve(api.paths.cwd!, config.appPath)
+  const outputPath = resolve(api.paths.cwd!, env === 'development' ? config.tmpPath : config.appPath)
   return {
     mode: env,
     output: {
@@ -20,7 +17,7 @@ const webpackBaseConfig = (api: IApi) => {
     resolve: {
       extensions: ['.tsx', '.ts', '.js'],
       alias: {
-        '@': api.paths.absSrcPath!,
+        '@': resolve(api.paths.cwd!, config.srcPath),
       },
       modules: [
         api.paths.absNodeModulesPath!,
@@ -66,11 +63,12 @@ const webpackBaseConfig = (api: IApi) => {
 }
 
 function buildElectronMain(api: IApi) {
+  const { srcPath } = api.config.electron
   const compiler = webpack({
     ...webpackBaseConfig(api),
     target: 'electron-main',
     entry: {
-      main: resolve(api.paths.absSrcPath!, 'electron/main.ts')
+      main: resolve(srcPath, 'main.ts')
     },
   })
   return new Promise((resolve, reject) => {
@@ -85,11 +83,12 @@ function buildElectronMain(api: IApi) {
 }
 
 function buildElectronPreload(api: IApi) {
+  const { srcPath } = api.config.electron
   const compiler = webpack({
     ...webpackBaseConfig(api),
     target: 'electron-preload',
     entry: {
-      preload: resolve(api.paths.absSrcPath!, 'electron/preload.ts'),
+      preload: resolve(srcPath, 'preload.ts'),
     }
   })
   return new Promise((resolve, reject) => {
@@ -104,12 +103,12 @@ function buildElectronPreload(api: IApi) {
 }
 
 export function buildSrc(api: IApi) {
-  api.logger.info('Build src/electron ...')
+  api.logger.info('Build electron source ...')
   return Promise.all([
     buildElectronMain(api),
     buildElectronPreload(api)
   ]).then(([main, preload]) => {
-    api.logger.info('Build src/electron done')
+    api.logger.info('Build electron source done')
   })
 }
 
