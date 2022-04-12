@@ -8,7 +8,7 @@ const webpackBaseConfig = (api: IApi) => {
   const env: 'development'| 'production' = (api.env === 'development' ? 'development' : 'production')
   const outputPath = env === 'development' ?
     resolve(api.paths.absTmpPath!, 'electron') :
-    resolve(api.paths.absOutputPath!, '../electron')
+    resolve(api.paths.cwd!, 'build/electron')
   return {
     mode: env,
     output: {
@@ -110,8 +110,11 @@ export function buildSrc(api: IApi) {
   ]).then(([main, preload]) => {
     api.logger.info('Build src/electron done')
     // output assets
-    fs.readdirSync(resolve(api.paths.cwd, 'build/electron')).forEach(file => {
-      console.log(` ${file}\n`);
+    const outputPath = api.env === 'development' ?
+      resolve(api.paths.absTmpPath!, 'electron') :
+      resolve(api.paths.cwd!, 'build/electron')
+    fs.readdirSync(outputPath).forEach(file => {
+      console.log(` ${outputPath}/${file}`);
     })
   })
 }
