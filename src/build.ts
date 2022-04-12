@@ -6,9 +6,10 @@ import * as electronBuilder from 'electron-builder'
 
 const webpackBaseConfig = (api: IApi) => {
   const env: 'development'| 'production' = (api.env === 'development' ? 'development' : 'production')
+  const config = api.config.electron
   const outputPath = env === 'development' ?
     resolve(api.paths.absTmpPath!, 'electron') :
-    resolve(api.paths.cwd!, 'build/electron')
+    resolve(api.paths.cwd!, config.appPath)
   return {
     mode: env,
     output: {
@@ -114,17 +115,18 @@ export function buildSrc(api: IApi) {
 
 export function buildApp(api: IApi) {
   api.logger.info('Build app ...')
+  const { appPath, packPath } = api.config.electron
   return electronBuilder.build({
     targets: electronBuilder.Platform.MAC.createTarget(),
     config: {
       ...api.pkg.build,
       files: [
-        "build/electron/**/*",
-        "build/web/**/*",
+        `${appPath}/**/*`,
+        `${api.config.outputPath}/**/*`,
         "package.json"
       ],
       directories: {
-        output: 'build/release',
+        output: packPath,
       }
     }
   }).then(() => {

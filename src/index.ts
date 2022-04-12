@@ -10,11 +10,15 @@ export default function(api: IApi) {
     key: 'electron',
     config: {
       default: {
-        inspectPort: 8889
+        inspectPort: 8889,
+        appPath: 'build/electron',
+        packPath: 'build/release',
       },
       schema(joi) {
         return joi.object({
           inspectPort: joi.number(),
+          appPath: joi.string(),
+          packPath: joi.string(),
         })
       }
     }
