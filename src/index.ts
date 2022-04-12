@@ -6,9 +6,17 @@ export default function(api: IApi) {
 
   const launchElectron = ['--electron'].every(v => process.argv.includes(v))
 
-  api.onStart(() => {
-    if (launchElectron) {
-      // buildElectronSrc(api)
+  api.describe({
+    key: 'electron',
+    config: {
+      default: {
+        inspectPort: 8889
+      },
+      schema(joi) {
+        return joi.object({
+          inspectPort: joi.number(),
+        })
+      }
     }
   })
 

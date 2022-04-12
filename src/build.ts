@@ -109,13 +109,6 @@ export function buildSrc(api: IApi) {
     buildElectronPreload(api)
   ]).then(([main, preload]) => {
     api.logger.info('Build src/electron done')
-    // output assets
-    const outputPath = api.env === 'development' ?
-      resolve(api.paths.absTmpPath!, 'electron') :
-      resolve(api.paths.cwd!, 'build/electron')
-    fs.readdirSync(outputPath).forEach(file => {
-      console.log(` ${outputPath}/${file}`);
-    })
   })
 }
 

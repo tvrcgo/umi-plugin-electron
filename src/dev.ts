@@ -4,6 +4,8 @@ import { existsSync } from 'fs'
 import type { IApi } from 'umi'
 
 export default (api: IApi) => {
+  const config = api.config.electron
+
   const electronPath = [
     resolve(__dirname, '../node_modules/.bin/electron'),
     resolve(api.paths.absNodeModulesPath, '.bin/electron')
@@ -16,7 +18,7 @@ export default (api: IApi) => {
   }
 
   elecProc = spawn(electronPath, [
-    `--inspect=8889`,
+    `--inspect=${config.inspectPort}`,
     resolve(api.paths.absTmpPath!, 'electron/main.js'),
   ])
 
