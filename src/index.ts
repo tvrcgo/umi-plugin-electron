@@ -28,23 +28,45 @@ export default function(api: IApi) {
     }
   })
 
-  api.onDevCompileDone(async ({ isFirstCompile, stats }) => {
+  let step = 0
+  const next = async () => {
+    switch (step) {
+      case 2:
+        // run electron
+        electronDev(api)
+        break
+      case 4:
+        // build app
+        buildApp(api)
+        break
+      default:
+        break
+    }
+  }
 
-    if (isFirstCompile && launchElectron) {
+  api.onStart(async () => {
+    if (launchElectron) {
       // build electron source
-      await buildSrc(api)
-      // run electron
-      electronDev(api)
+      buildSrc(api)
+        .then(() => {
+          step += 1
+          next()
+        })
+    }
+  })
+
+  api.onDevCompileDone(async ({ isFirstCompile, stats }) => {
+    if (isFirstCompile && launchElectron) {
+      step += 1
+      next()
     }
 
   })
 
   api.onBuildComplete(async ({ stats }) => {
     if (launchElectron) {
-      // build electron source
-      await buildSrc(api)
-      // build app
-      buildApp(api)
+      step += 3
+      next()
     }
   })
 
