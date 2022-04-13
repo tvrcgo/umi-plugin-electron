@@ -39,9 +39,6 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Publish to npm registry
         run: |
-          npm config set //registry.npmjs.org/:_authToken ${NODE_AUTH_TOKEN}
-          npm config set package-lock false
-          npm config set init-author-name tvrcgo
           echo "`jq '.name="tvrcgo-umi-plugin-electron"' package.json`" > package.json
           npm install
           npm publish
