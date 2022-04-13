@@ -1,6 +1,8 @@
 import webpack from 'webpack'
 import { resolve } from 'path'
+import fs from 'fs'
 import type { IApi } from 'umi'
+import fg from 'fast-glob'
 import * as electronBuilder from 'electron-builder'
 import electronDev from './dev'
 
@@ -69,7 +71,9 @@ export function buildSrc(api: IApi) {
   return Promise.all([
     buildElectronMain(api),
     buildElectronPreload(api)
-  ])
+  ]).then(() => {
+    buildManifest(api)
+  })
 }
 
 function buildElectronMain(api: IApi) {
@@ -129,6 +133,35 @@ function handleCompiler(entry, compiler, api) {
       })
     }
   })
+}
+
+function buildManifest(api: IApi) {
+  const { srcPath, appPath, tmpPath } = api.config.electron
+  const ctx = process.argv.includes('dev') ? tmpPath : appPath
+  const manifest = resolve(ctx, 'manifest.json')
+  // ipc
+  const ipcPath = resolve(srcPath, 'ipc')
+  const ipcFiles = fg.sync(['**/*.ts'], { dot: false, onlyFiles: true, cwd: ipcPath })
+  appendJSON(manifest, {
+    ipc: ipcFiles.map(file => file.replace(/\.(ts|js)x?$/g, ''))
+  })
+}
+
+function appendJSON(filePath: string, obj: any) {
+  try {
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, JSON.stringify(obj))
+    } else {
+      const data = fs.readFileSync(filePath)
+      const curr = JSON.parse(data.toString())
+      fs.writeFileSync(filePath, JSON.stringify({
+        ...curr,
+        ...obj,
+      }))
+    }
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 export function buildApp(api: IApi) {
