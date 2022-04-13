@@ -114,13 +114,13 @@ function handleCompiler(entry, compiler, api) {
           return
         }
         api.logger.info(`Build electron <${entry}> complete`)
-        resolve(1)
-
-        if (!isFirstBuild) {
-          api.logger.info('Restart electron')
+        if (isFirstBuild) {
+          resolve(1)
+          isFirstBuild = false
+        } else {
+          api.logger.info('Restart electron ...')
           electronDev(api)
         }
-        isFirstBuild = false
       })
     } else {
       compiler.run((err) => {
