@@ -2,6 +2,7 @@ import webpack from 'webpack'
 import { resolve } from 'path'
 import type { IApi } from 'umi'
 import * as electronBuilder from 'electron-builder'
+import electronDev from './dev'
 
 const webpackBaseConfig = (api: IApi) => {
   const env: 'development'| 'production' = (api.env === 'development' ? 'development' : 'production')
@@ -63,6 +64,14 @@ const webpackBaseConfig = (api: IApi) => {
   }
 }
 
+export function buildSrc(api: IApi) {
+  api.logger.info('Build electron source ...')
+  return Promise.all([
+    buildElectronMain(api),
+    buildElectronPreload(api)
+  ])
+}
+
 function buildElectronMain(api: IApi) {
   const { srcPath } = api.config.electron
   const compiler = webpack({
@@ -72,15 +81,7 @@ function buildElectronMain(api: IApi) {
       main: resolve(srcPath, 'main.ts')
     },
   })
-  return new Promise((resolve, reject) => {
-    compiler.run((err) => {
-      if (err) {
-        api.logger.error(err)
-        return reject(err)
-      }
-      resolve(1)
-    })
-  })
+  return handleCompiler('main', compiler, api)
 }
 
 function buildElectronPreload(api: IApi) {
@@ -92,24 +93,41 @@ function buildElectronPreload(api: IApi) {
       preload: resolve(srcPath, 'preload.ts'),
     }
   })
-  return new Promise((resolve, reject) => {
-    compiler.run((err) => {
-      if (err) {
-        api.logger.error(err)
-        return reject(err)
-      }
-      resolve(1)
-    })
-  })
+  return handleCompiler('preload', compiler, api)
 }
 
-export function buildSrc(api: IApi) {
-  api.logger.info('Build electron source ...')
-  return Promise.all([
-    buildElectronMain(api),
-    buildElectronPreload(api)
-  ]).then(([main, preload]) => {
-    api.logger.info('Build electron source done')
+function handleCompiler(entry, compiler, api) {
+  return new Promise((resolve, reject) => {
+    let isFirstBuild = true
+    if (api.env === 'development') {
+      compiler.watch({
+        aggregateTimeout: 500,
+        poll: 1000,
+        stdin: true
+      }, (err, stats) => {
+        if (err) {
+          api.logger.error(err)
+          return
+        }
+        api.logger.info(`Build electron <${entry}> complete`)
+        resolve(1)
+
+        if (!isFirstBuild) {
+          api.logger.info('Restart electron')
+          electronDev(api)
+        }
+        isFirstBuild = false
+      })
+    } else {
+      compiler.run((err) => {
+        if (err) {
+          api.logger.error(err)
+          return reject(err)
+        }
+        api.logger.info(`Build electron <${entry}> complete`)
+        resolve(1)
+      })
+    }
   })
 }
 

@@ -1,7 +1,9 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { resolve } from 'path'
 import { existsSync } from 'fs'
 import type { IApi } from 'umi'
+import respawn from 'respawn'
+
+let proc = null
 
 export default (api: IApi) => {
   const config = api.config.electron
@@ -10,21 +12,21 @@ export default (api: IApi) => {
     resolve(__dirname, '../node_modules/.bin/electron'),
     resolve(api.paths.absNodeModulesPath, '.bin/electron')
   ].filter(v => existsSync(v))[0]
-  let elecProc: ChildProcessWithoutNullStreams | null = null
 
-  if (elecProc !== null) {
-    (elecProc as any).kill('SIGKILL')
-    elecProc = null
+  if (!proc) {
+    proc = respawn([
+      electronPath,
+      `--inspect=${config.inspectPort}`,
+      resolve(api.paths.absTmpPath!, 'electron/main.js'),
+    ])
   }
 
-  elecProc = spawn(electronPath, [
-    `--inspect=${config.inspectPort}`,
-    resolve(api.paths.absTmpPath!, 'electron/main.js'),
-  ])
+  if (proc.status === 'running') {
+    proc.stop(() => {
+      proc.start()
+    })
+  } else {
+    proc.start()
+  }
 
-  elecProc.on('close', (code, signal) => {
-    if (signal != 'SIGKILL') {
-      process.exit(-1)
-    }
-  })
 }

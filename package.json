@@ -18,6 +18,7 @@
     "ajv": "^8.11.0",
     "electron": "^17.2.0",
     "electron-builder": "^23.0.3",
+    "respawn": "^2.6.0",
     "rimraf": "^3.0.2",
     "ts-loader": "~8.2.0",
     "typescript": "^4.6.3",
