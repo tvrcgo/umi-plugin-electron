@@ -17,7 +17,7 @@ export default (api: IApi) => {
     proc = respawn([
       electronPath,
       `--inspect=${config.inspectPort}`,
-      resolve(api.paths.absTmpPath!, 'electron/main.js'),
+      resolve(config.tmpPath, 'main.js'),
     ])
 
     proc.on('exit', (code, signal) => {
