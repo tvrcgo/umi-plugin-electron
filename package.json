@@ -11,9 +11,6 @@
     "clean": "rimraf lib",
     "prepublishOnly": "npm run clean && npm run build"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "dependencies": {
     "ajv": "^8.11.0",
     "electron": "^17.2.0",
