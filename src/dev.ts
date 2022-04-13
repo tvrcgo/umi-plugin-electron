@@ -19,6 +19,14 @@ export default (api: IApi) => {
       `--inspect=${config.inspectPort}`,
       resolve(api.paths.absTmpPath!, 'electron/main.js'),
     ])
+
+    proc.on('exit', (code, signal) => {
+      // 主动退出应用
+      if (code === 0) {
+        proc.stop()
+        process.exit(0)
+      }
+    })
   }
 
   if (proc.status === 'running') {
