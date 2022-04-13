@@ -6,7 +6,7 @@ import * as electronBuilder from 'electron-builder'
 const webpackBaseConfig = (api: IApi) => {
   const env: 'development'| 'production' = (api.env === 'development' ? 'development' : 'production')
   const config = api.config.electron
-  const outputPath = resolve(api.paths.cwd!, env === 'development' ? config.tmpPath : config.appPath)
+  const outputPath = resolve(api.paths.cwd, env === 'development' ? config.tmpPath : config.appPath)
   return {
     mode: env,
     output: {
@@ -17,7 +17,8 @@ const webpackBaseConfig = (api: IApi) => {
     resolve: {
       extensions: ['.tsx', '.ts', '.js'],
       alias: {
-        '@': resolve(api.paths.cwd!, config.srcPath),
+        '@': api.paths.absSrcPath,
+        '@@': api.paths.absTmpPath,
       },
       modules: [
         api.paths.absNodeModulesPath!,
