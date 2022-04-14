@@ -4,7 +4,7 @@ import fs from 'fs'
 import type { IApi } from 'umi'
 import fg from 'fast-glob'
 import * as electronBuilder from 'electron-builder'
-import electronDev from './dev'
+import runDev from './dev'
 
 const webpackBaseConfig = (api: IApi) => {
   const env: 'development'| 'production' = (api.env === 'development' ? 'development' : 'production')
@@ -119,7 +119,8 @@ function handleCompiler(entry, compiler, api) {
           isFirstBuild = false
         } else {
           api.logger.info('Restart electron ...')
-          electronDev(api)
+          buildManifest(api)
+          runDev(api)
         }
       })
     } else {

@@ -1,6 +1,6 @@
 import type { IApi } from 'umi'
 import { buildApp, buildSrc } from './build'
-import electronDev from './dev'
+import runDev from './dev'
 
 export default function(api: IApi) {
 
@@ -33,7 +33,7 @@ export default function(api: IApi) {
     switch (step) {
       case 2:
         // run electron
-        electronDev(api)
+        runDev(api)
         break
       case 4:
         // build app
