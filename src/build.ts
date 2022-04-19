@@ -1,9 +1,10 @@
 import webpack from 'webpack'
-import { resolve } from 'path'
+import { resolve, dirname } from 'path'
 import fs from 'fs'
 import type { IApi } from 'umi'
 import fg from 'fast-glob'
 import * as electronBuilder from 'electron-builder'
+import mkdirp from 'mkdirp'
 import runDev from './dev'
 
 const webpackBaseConfig = (api: IApi) => {
@@ -70,10 +71,9 @@ export function buildSrc(api: IApi) {
   api.logger.info('Build electron source ...')
   return Promise.all([
     buildElectronMain(api),
-    buildElectronPreload(api)
-  ]).then(() => {
+    buildElectronPreload(api),
     buildManifest(api)
-  })
+  ])
 }
 
 function buildElectronMain(api: IApi) {
@@ -151,6 +151,7 @@ function buildManifest(api: IApi) {
 function appendJSON(filePath: string, obj: any) {
   try {
     if (!fs.existsSync(filePath)) {
+      mkdirp.sync(dirname(filePath))
       fs.writeFileSync(filePath, JSON.stringify(obj))
     } else {
       const data = fs.readFileSync(filePath)

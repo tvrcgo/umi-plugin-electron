@@ -1,4 +1,6 @@
 import type { IApi } from 'umi'
+import os from 'os'
+import { resolve } from 'path'
 import { buildApp, buildSrc } from './build'
 import runDev from './dev'
 
@@ -12,7 +14,7 @@ export default function(api: IApi) {
       default: {
         inspectPort: 8889,
         srcPath: 'src/electron',
-        tmpPath: 'src/.umi/electron',
+        tmpPath: resolve(os.tmpdir(), api.pkg.name),
         appPath: 'build/electron',
         packPath: 'build/release',
       },
